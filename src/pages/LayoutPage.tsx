@@ -10,22 +10,29 @@ import {
 import { HeaderLayout } from "../components/Layout/HeaderLayout";
 import { SideLayout } from "../components/Layout/SideLayout";
 import type { MenuItem } from "../components/Layout/SideLayout";
+import { useAuthStore } from "../hooks/useAuthStore";
+import type { RolUsuario } from "../types/usuario";
 
-// Definición extendida para controlar visibilidad por rol
 interface RoleMenuItem extends MenuItem {
-  allowedRoles?: string[]; // Si no se especifica, es visible para todos
+  allowedRoles?: RolUsuario[];
 }
 
-export default function PageLayout() {
+export default function LayoutPage() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
 
-  // Ejemplo de datos del usuario (puedes conectarlos a tu Context, Redux o Zustand)
-  const currentUser = {
-    name: "María Cordova",
-    role: "Administrador",
-  };
+  // Conectado directamente a tu estado global en Zustand
+  const usuario = useAuthStore((s) => s.usuario);
+  const refrescarUsuario = useAuthStore((s) => s.refrescarUsuario);
+  const logout = useAuthStore((s) => s.logout);
+
+  // Sincroniza los datos frescos del usuario desde GET /usuario/:id al montar
+  useEffect(() => {
+    refrescarUsuario();
+  }, [refrescarUsuario]);
 
   // Lógica para aplicar clase 'dark' al HTML
   useEffect(() => {
@@ -37,12 +44,19 @@ export default function PageLayout() {
     }
   }, [isDarkMode]);
 
-  // Configuración centralizada de los futuros ítems del menú
+  // Datos reales del usuario autenticado
+  const userName = usuario
+    ? `${usuario.nombres} ${usuario.apellidos}`
+    : "Usuario";
+  const userRole = usuario?.rol ?? "EMPLEADO";
+
+  // Configuración centralizada de los ítems del menú con roles reales en MAYÚSCULAS
   const allMenuItems: RoleMenuItem[] = [
     {
       label: "Dashboard",
       path: "/dashboard",
       icon: LayoutDashboard,
+      allowedRoles: ["ADMIN", "AGENTE"],
     },
     {
       label: "Tickets / Tareas",
@@ -54,38 +68,38 @@ export default function PageLayout() {
       label: "Categorías",
       path: "/categorias",
       icon: FolderKanban,
-      allowedRoles: ["Administrador", "Agente"],
+      allowedRoles: ["ADMIN", "AGENTE"],
     },
     {
       label: "Usuarios",
       path: "/usuarios",
       icon: Users,
-      allowedRoles: ["Administrador"],
+      allowedRoles: ["ADMIN"],
     },
     {
       label: "Configuración",
       path: "/configuracion",
       icon: Settings,
-      allowedRoles: ["Administrador"],
+      allowedRoles: ["ADMIN"],
     },
   ];
 
-  // Lógica para presentar los ítems permitidos según el rol del usuario
+  // Filtra los ítems permitidos según el rol real del usuario
   const visibleMenuItems = useMemo(() => {
     return allMenuItems.filter((item) => {
       if (!item.allowedRoles || item.allowedRoles.length === 0) return true;
-      return item.allowedRoles.includes(currentUser.role);
+      return item.allowedRoles.includes(userRole);
     });
-  }, [currentUser.role]);
+  }, [userRole]);
 
+  // Limpia sesión en Zustand y redirige al Login
   const handleLogout = () => {
-    // Aquí limpias tu token (localStorage.removeItem('token'), etc.)
-    navigate("/login");
+    logout();
+    navigate("/login", { replace: true });
   };
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      {/* Barra Lateral */}
       <SideLayout
         menuItems={visibleMenuItems}
         isOpen={isSidebarOpen}
@@ -94,17 +108,15 @@ export default function PageLayout() {
         creatorsText="Creado por DevTeam FUNVAL • v1.0"
       />
 
-      {/* Contenedor Principal (Header + Contenido dinámico) */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <HeaderLayout
-          userName={currentUser.name}
-          userRole={currentUser.role}
+          userName={userName}
+          userRole={userRole}
           onOpenSidebar={() => setIsSidebarOpen(true)}
           isDarkMode={isDarkMode}
           onToggleTheme={() => setIsDarkMode((prev) => !prev)}
         />
 
-        {/* Área donde se renderizan las vistas hijas de React Router */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl">
             <Outlet />

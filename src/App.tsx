@@ -1,46 +1,59 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
-import PageNotFound from "./pages/PageNotFound";
-import PageLayout from "./pages/PageLayout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import LayoutPage from "./pages/LayoutPage";
+import LoginPage from "./pages/LoginPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import UsuarioPage from "./pages/UsuarioPage";
 
-function App() {
+export default function App() {
   return (
     <>
       <Toaster richColors position="top-right" />
       <Routes>
-        {/* Redirección opcional si entran a la raíz "/" */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Redirección inicial */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Rutas protegidas que comparten el HeaderLayout y SideLayout */}
-        <Route element={<PageLayout />}>
-          <Route
-            path="/dashboard"
-            element={<div>Vista General del Dashboard</div>}
-          />
-          <Route
-            path="/tareas"
-            element={<div>Gestión de Tickets / Tareas</div>}
-          />
-          <Route
-            path="/categorias"
-            element={<div>Gestión de Categorías</div>}
-          />
-          <Route path="/usuarios" element={<div>Gestión de Usuarios</div>} />
-          <Route
-            path="/configuracion"
-            element={<div>Configuración del Sistema</div>}
-          />
+        {/* Rutas públicas */}
+        <Route path="/login" element={<LoginPage />} />
 
-          <Route path="*" element={<PageNotFound />} />
+        {/* Rutas privadas (requieren sesión iniciada) */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<LayoutPage />}>
+            {/* Accesibles para todos los usuarios autenticados */}
+            <Route
+              path="/tareas"
+              element={<div>Gestión de Tickets / Tareas</div>}
+            />
+
+            {/* Solo ADMINISTRADOR y AGENTE */}
+            <Route
+              element={<ProtectedRoute allowedRoles={["ADMIN", "AGENTE"]} />}
+            >
+              <Route
+                path="/dashboard"
+                element={<div>Vista General del Dashboard</div>}
+              />
+              <Route
+                path="/categorias"
+                element={<div>Gestión de Categorías</div>}
+              />
+            </Route>
+
+            {/* Solo ADMINISTRADOR */}
+            <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+              <Route path="/usuarios" element={<UsuarioPage />} />
+              <Route
+                path="/configuracion"
+                element={<div>Configuración del Sistema</div>}
+              />
+            </Route>
+
+            {/* Ruta 404 dentro del layout */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
         </Route>
-
-        {/* Rutas públicas (sin Sidebar ni Header) */}
-        <Route path="/login" element={<div>Página Login</div>} />
-
-        {/* Ruta 404 */}
       </Routes>
     </>
   );
 }
-
-export default App;

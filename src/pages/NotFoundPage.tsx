@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Headset, ArrowLeft, Home } from "lucide-react";
 
-export default function PaginaNotFound() {
+export default function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
