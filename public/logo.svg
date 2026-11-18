@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <!-- Degradado de fondo: blue-600 -> purple-600 -> fuchsia-600 -->
+    <linearGradient id="bg-gradient" x1="4" y1="8" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="50%" stop-color="#9333EA" />
+      <stop offset="100%" stop-color="#C026D3" />
+    </linearGradient>
+  </defs>
+
+  <!-- Contenedor redondeado (rounded-2xl) -->
+  <rect x="4" y="8" width="52" height="52" rx="16" fill="url(#bg-gradient)" />
+
+  <!-- Icono Headset (Lucide) -->
+  <g transform="translate(15, 19) scale(1.25)" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z" />
+    <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
+  </g>
+
+  <!-- Distintivo circular (bg-fuchsia-500 + ring-2 ring-white) -->
+  <circle cx="51" cy="13" r="10" fill="#D946EF" stroke="#FFFFFF" stroke-width="2.5" />
+
+  <!-- Icono Sparkles dentro del distintivo -->
+  <g transform="translate(45, 7) scale(0.5)" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+    <path d="M20 3v4" />
+    <path d="M22 5h-4" />
+    <path d="M4 17v2" />
+    <path d="M5 18H3" />
+  </g>
+</svg>
