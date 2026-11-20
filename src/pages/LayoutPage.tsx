@@ -1,16 +1,16 @@
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import {
+  FolderKanban,
   LayoutDashboard,
+  Settings,
   Ticket,
   Users,
-  FolderKanban,
-  Settings,
 } from "lucide-react";
 import { HeaderLayout } from "../components/Layout/HeaderLayout";
-import { SideLayout } from "../components/Layout/SideLayout";
-import type { MenuItem } from "../components/Layout/SideLayout";
+import { SideLayout, type MenuItem } from "../components/Layout/SideLayout";
 import { useAuthStore } from "../hooks/useAuthStore";
+import { useTareas } from "../hooks/useTareas";
 import type { RolUsuario } from "../types/usuario";
 
 interface RoleMenuItem extends MenuItem {
@@ -24,33 +24,25 @@ export default function LayoutPage() {
     document.documentElement.classList.contains("dark"),
   );
 
-  // Conectado directamente a tu estado global en Zustand
-  const usuario = useAuthStore((s) => s.usuario);
-  const refrescarUsuario = useAuthStore((s) => s.refrescarUsuario);
-  const logout = useAuthStore((s) => s.logout);
+  const usuario = useAuthStore((state) => state.usuario);
+  const refrescarUsuario = useAuthStore((state) => state.refrescarUsuario);
+  const logout = useAuthStore((state) => state.logout);
+  const bandeja = useTareas(usuario?.id);
 
-  // Sincroniza los datos frescos del usuario desde GET /usuario/:id al montar
   useEffect(() => {
-    refrescarUsuario();
+    void refrescarUsuario();
   }, [refrescarUsuario]);
 
-  // Lógica para aplicar clase 'dark' al HTML
   useEffect(() => {
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
 
-  // Datos reales del usuario autenticado
   const userName = usuario
     ? `${usuario.nombres} ${usuario.apellidos}`
     : "Usuario";
   const userRole = usuario?.rol ?? "EMPLEADO";
+  const mostrarBurbuja = userRole !== "EMPLEADO" && bandeja.nuevas > 0;
 
-  // Configuración centralizada de los ítems del menú con roles reales en MAYÚSCULAS
   const allMenuItems: RoleMenuItem[] = [
     {
       label: "Dashboard",
@@ -62,7 +54,7 @@ export default function LayoutPage() {
       label: "Tickets / Tareas",
       path: "/tareas",
       icon: Ticket,
-      badge: 5,
+      badge: mostrarBurbuja ? bandeja.nuevas : undefined,
     },
     {
       label: "Categorías",
@@ -84,19 +76,15 @@ export default function LayoutPage() {
     },
   ];
 
-  // Filtra los ítems permitidos según el rol real del usuario
-  const visibleMenuItems = useMemo(() => {
-    return allMenuItems.filter((item) => {
-      if (!item.allowedRoles || item.allowedRoles.length === 0) return true;
-      return item.allowedRoles.includes(userRole);
-    });
-  }, [userRole]);
+  const visibleMenuItems = allMenuItems.filter(
+    (item) =>
+      !item.allowedRoles?.length || item.allowedRoles.includes(userRole),
+  );
 
-  // Limpia sesión en Zustand y redirige al Login
-  const handleLogout = () => {
+  function handleLogout() {
     logout();
     navigate("/login", { replace: true });
-  };
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -119,7 +107,7 @@ export default function LayoutPage() {
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl">
-            <Outlet />
+            <Outlet context={bandeja} />
           </div>
         </main>
       </div>

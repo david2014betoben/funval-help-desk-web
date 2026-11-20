@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate, useNavigate, Link } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Mail, Lock, Sun, Moon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "../hooks/useAuthStore";

@@ -1,32 +1,26 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import CategoriasPage from "./pages/CategoriasPage";
 import LayoutPage from "./pages/LayoutPage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import TareasPage from "./pages/TareasPage";
 import UsuarioPage from "./pages/UsuarioPage";
 
 export default function App() {
   return (
     <>
       <Toaster richColors position="top-right" />
-      <Routes>
-        {/* Redirección inicial */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Rutas públicas */}
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Rutas privadas (requieren sesión iniciada) */}
         <Route element={<ProtectedRoute />}>
           <Route element={<LayoutPage />}>
-            {/* Accesibles para todos los usuarios autenticados */}
-            <Route
-              path="/tareas"
-              element={<div>Gestión de Tickets / Tareas</div>}
-            />
+            <Route path="/tareas" element={<TareasPage />} />
 
-            {/* Solo ADMINISTRADOR y AGENTE */}
             <Route
               element={<ProtectedRoute allowedRoles={["ADMIN", "AGENTE"]} />}
             >
@@ -34,13 +28,9 @@ export default function App() {
                 path="/dashboard"
                 element={<div>Vista General del Dashboard</div>}
               />
-              <Route
-                path="/categorias"
-                element={<div>Gestión de Categorías</div>}
-              />
+              <Route path="/categorias" element={<CategoriasPage />} />
             </Route>
 
-            {/* Solo ADMINISTRADOR */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
               <Route path="/usuarios" element={<UsuarioPage />} />
               <Route
@@ -49,7 +39,6 @@ export default function App() {
               />
             </Route>
 
-            {/* Ruta 404 dentro del layout */}
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>
