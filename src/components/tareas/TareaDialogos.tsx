@@ -19,6 +19,7 @@ import {
 } from "../../types/tarea";
 import type { Usuario, UsuarioAutenticado } from "../../types/usuario";
 import { Dialogo } from "./Dialogo";
+import { DetallesComentarios } from "./DetallesComentarios";
 
 export function EstadoTicket({ estado }: { estado: Tarea["estado"] }) {
   return (
@@ -233,8 +234,15 @@ export function DetalleTarea({
           </button>
         )}
         {ocupado && <p role="status">Guardando cambios…</p>}
-        {/* Integrar aquí el componente de comentarios con tarea.id. */}
-        <div className="fd-placeholder">Aquí van los comentarios</div>
+        <DetallesComentarios
+          idTarea={tarea.id}
+          usuario={usuario}
+          puedeInteractuar={
+            admin ||
+            (usuario.rol === "EMPLEADO" && tarea.empleado?.id === usuario.id) ||
+            (esAgente && tarea.id_agente === usuario.id)
+          }
+        />
       </div>
       {verificada && <MarcarRevisada id={id} revisar={revisar} />}
     </Dialogo>
