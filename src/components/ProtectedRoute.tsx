@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useOutletContext } from "react-router-dom";
 import { useAuthStore } from "../hooks/useAuthStore";
 import type { RolUsuario } from "../types/usuario";
 
@@ -13,6 +13,7 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const usuario = useAuthStore((s) => s.usuario);
+  const contexto = useOutletContext();
 
   // 1. Si no está autenticado o no hay datos del usuario, redirige al Login
   if (!isAuthenticated || !usuario) {
@@ -25,5 +26,5 @@ export function ProtectedRoute({
   }
 
   // 3. Renderiza las rutas hijas protegidas
-  return <Outlet />;
+  return <Outlet context={contexto} />;
 }
