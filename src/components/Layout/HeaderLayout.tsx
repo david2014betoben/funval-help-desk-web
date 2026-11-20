@@ -1,4 +1,5 @@
 import { Menu, Sun, Moon, UserCheck } from "lucide-react";
+import CampanaNotificaciones from "../notificaciones/CampanaNotificaciones";
 
 interface HeaderLayoutProps {
   userName: string;
@@ -48,6 +49,9 @@ export function HeaderLayout({
             <Moon className="h-5 w-5" />
           )}
         </button>
+
+                {/* Campana de notificaciones */}
+        <CampanaNotificaciones />
 
         {/* Separador vertical */}
         <div className="h-7 w-px bg-slate-200 dark:bg-slate-700" />
