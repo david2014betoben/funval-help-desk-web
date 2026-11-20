@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Mail, Lock, Sun, Moon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTema } from "../hooks/useTema";
 import { useAuthStore } from "../hooks/useAuthStore";
 import { loginAuthService } from "../services/authService";
 import { extraerMensajeError } from "../lib/errorHandle";
@@ -27,16 +28,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
 
-  // Estado local sincronizado con la clase 'dark' del HTML
-  const [isDark, setIsDark] = useState(() =>
-    document.documentElement.classList.contains("dark"),
-  );
-
-  const toggleTheme = () => {
-    const nuevoTema = !isDark;
-    setIsDark(nuevoTema);
-    document.documentElement.classList.toggle("dark", nuevoTema);
-  };
+  const isDark = useTema((state) => state.oscuro);
+  const toggleTheme = useTema((state) => state.alternar);
 
   // Redirección si ya está autenticado
   if (isAuthenticated && usuario) {

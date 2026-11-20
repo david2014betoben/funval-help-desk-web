@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -49,7 +49,14 @@ export default function TareasPage() {
   const bandeja = useOutletContext<ReturnType<typeof useTareas>>();
   const [filtros, setFiltros] = useState(filtrosIniciales);
   const [pagina, setPagina] = useState(1);
-  const [pestana, setPestana] = useState<(typeof pestanas)[number]>("Nuevos");
+  const [params, setParams] = useSearchParams();
+  const bandejaActiva = params.get("bandeja");
+  const pestana =
+    bandejaActiva === "activos"
+      ? "Mis tickets activos"
+      : bandejaActiva === "historial"
+        ? "Historial"
+        : "Nuevos";
   const [seleccionada, setSeleccionada] = useState<Tarea | null>(null);
   const [nueva, setNueva] = useState(false);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -226,7 +233,15 @@ export default function TareasPage() {
               key={opcion}
               aria-pressed={pestana === opcion}
               onClick={() => {
-                setPestana(opcion);
+                setParams(
+                  opcion === "Nuevos"
+                    ? {}
+                    : {
+                        bandeja:
+                          opcion === "Historial" ? "historial" : "activos",
+                      },
+                  { replace: true },
+                );
                 setPagina(1);
                 setFiltros(filtrosIniciales);
               }}

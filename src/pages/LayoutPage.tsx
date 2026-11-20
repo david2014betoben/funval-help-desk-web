@@ -10,6 +10,7 @@ import {
 import { HeaderLayout } from "../components/Layout/HeaderLayout";
 import { SideLayout, type MenuItem } from "../components/Layout/SideLayout";
 import { useAuthStore } from "../hooks/useAuthStore";
+import { useTema } from "../hooks/useTema";
 import { useTareas } from "../hooks/useTareas";
 import type { RolUsuario } from "../types/usuario";
 
@@ -20,9 +21,8 @@ interface RoleMenuItem extends MenuItem {
 export default function LayoutPage() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() =>
-    document.documentElement.classList.contains("dark"),
-  );
+  const isDarkMode = useTema((state) => state.oscuro);
+  const toggleTheme = useTema((state) => state.alternar);
 
   const usuario = useAuthStore((state) => state.usuario);
   const refrescarUsuario = useAuthStore((state) => state.refrescarUsuario);
@@ -32,10 +32,6 @@ export default function LayoutPage() {
   useEffect(() => {
     void refrescarUsuario();
   }, [refrescarUsuario]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode);
-  }, [isDarkMode]);
 
   const userName = usuario
     ? `${usuario.nombres} ${usuario.apellidos}`
@@ -102,7 +98,7 @@ export default function LayoutPage() {
           userRole={userRole}
           onOpenSidebar={() => setIsSidebarOpen(true)}
           isDarkMode={isDarkMode}
-          onToggleTheme={() => setIsDarkMode((prev) => !prev)}
+          onToggleTheme={toggleTheme}
         />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
